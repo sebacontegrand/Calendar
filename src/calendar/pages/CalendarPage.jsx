@@ -12,6 +12,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { CalendarModal } from '../component/CalendarModal'
 import { useUiStore } from '../../hooks/useUiStore'
 import { useCalendarStore } from '../../hooks/useCalendarStore'
+import { FabDelete } from '../component/FabDelete'
 
 
 const locales = {
@@ -74,7 +75,9 @@ openDateModal()
      onView={onViewChange}
    />
    <CalendarModal/>
+   <FabDelete/>
    <FabAddNew/>
+   
     </>
   )
 }
