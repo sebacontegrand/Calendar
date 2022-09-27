@@ -17,7 +17,7 @@ const registerFormFields={
 }
 
 export const LoginPage = () => {
-    const{startLogin,errorMessage, startRegisterLogin} = useAuthStore();
+    const{startLogin, errorMessage, startRegisterLogin} = useAuthStore();
 
     const{loginEmail,loginPassword, onInputChange:onLoginInputChange} = useForm(loginFormFields);
     const{registerName,registerEmail,registerPassword,registerPassword2, onInputChange:onRegisterInputChange}=useForm(registerFormFields)
@@ -28,12 +28,10 @@ export const LoginPage = () => {
     }
     const registerSubmit=(event)=>{
         event.preventDefault();
-       
-    startRegisterLogin({name:registerName, email:registerEmail, password:registerPassword, password2:registerPassword2})
-         if(registerPassword !==registerPassword2){
+         if(registerPassword !== registerPassword2){
             Swal.fire('Error de authenticacion', 'las contrasenas deben coincidir','error');
             return;}
-
+            startRegisterLogin({name:registerName, email:registerEmail, password:registerPassword, password2:registerPassword2})
     }
 
     useEffect(() => {

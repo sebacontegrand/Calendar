@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux"
-import calendarAPI from "../api/calendarAPi";
+import  calendarAPI  from "../api/calendarAPi";
 import { clearErrorMessage, onChecking, onLogin, onLogout } from "../store/auth/authSlice";
 
 export const useAuthStore = () => {
@@ -7,27 +7,11 @@ export const useAuthStore = () => {
     
     const{status, user, errorMessage}=useSelector(state=>state.auth)
     const dispatch= useDispatch();
+    
     const startLogin = async({email,password})=>{
         dispatch(onChecking())
         try {
-            const {data}= await calendarAPI.post('/auth',{email,password})
-            localStorage.setItem('token',data.token);
-            localStorage.setItem('token-init-date',new Date().getTime())
-            dispatch(onLogin({name:data.name, uid:data.uid}))
-           
-        } catch (error) {
-            dispatch(onLogout(error.response.data?.msg || ''))
-            
-            setTimeout(() => {
-                dispatch(clearErrorMessage())
-            }, 10);
-        }
-        
-    }
-    const startRegisterLogin = async({name,email,password,password2})=>{
-        dispatch(onChecking())
-        try {
-            const {data}= await calendarAPI.post('/auth/new',{name,email,password,password2})
+            const {data} = await calendarAPI.post('/auth',{email,password})
             localStorage.setItem('token',data.token);
             localStorage.setItem('token-init-date',new Date().getTime())
             dispatch(onLogin({name:data.name, uid:data.uid}))
@@ -39,7 +23,45 @@ export const useAuthStore = () => {
                 dispatch(clearErrorMessage())
             }, 10);
         }
+        
+    }
+    const startRegisterLogin = async({name,email,password})=>{
+        dispatch(onChecking())
+        try {
+            const {data} = await calendarAPI.post('/auth/new',{name,email,password})
+            localStorage.setItem('token',data.token);
+            localStorage.setItem('token-init-date',new Date().getTime())
+            dispatch(onLogin({name:data.name, uid:data.uid}))
+           
+        } catch (error) {
+           
+            dispatch(onLogout(error.response.data?.msg || 'EL usuario ya existe'))
+           
+            setTimeout(() => {
+                dispatch(clearErrorMessage())
+            }, 10);
+        }
 
+    }
+    const checkAuthToken=async()=>{
+const token=localStorage.getItem('token');
+if(!token)return dispatch(onLogout());
+
+try {
+    const{data}=await calendarAPI.get('auth/new');
+    localStorage.setItem('token',data.token);
+    localStorage.setItem('token-init-date',new Date().getTime())
+    dispatch(onLogin({name:data.name, uid:data.uid}))
+} catch (error) {
+    localStorage.clear();
+    dispatch(onLogout())
+}
+
+    }
+
+    const startLogout= () => {
+        localStorage.clear();
+        dispatch(onLogout());
     }
 
     return{
@@ -47,7 +69,9 @@ export const useAuthStore = () => {
         user, 
         errorMessage,
         startLogin,
-        startRegisterLogin
+        startRegisterLogin,
+        checkAuthToken,
+        startLogout,
 
     }
 }
