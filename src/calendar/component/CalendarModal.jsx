@@ -30,9 +30,9 @@ export const CalendarModal = () => {
     const {closeDateModal}= useUiStore()
     const [formValues, setFormValues] = useState({
     title:"",
-    notes:"",
-    start:new Date(),
-    end:addHours(new Date(),2)
+    note:"",
+    initialDate:new Date(),
+    finalDate:addHours(new Date(),2)
 })
 const titleClass =useMemo(()=>{
     if(!formSubmit) return'';
@@ -69,7 +69,7 @@ useEffect(() => {
     const onSubmit= async(event)=>{
     event.preventDefault();
     setFormSubmit(true)
-        const difference = differenceInSeconds(formValues.end,formValues.start)
+        const difference = differenceInSeconds(formValues.finalDate,formValues.initialDate)
     if(isNaN(difference)|| difference <= 0) {
 Swal.fire('Fechas incorrectas', 'Revisar las fechas ingresadas', 'error')
     return;
@@ -102,9 +102,9 @@ if (formValues.title.length<=0) {
     <div className="form-group mb-2">
         <label>Fecha y hora inicio</label>
         <DatePicker
-        selected={formValues.start}
+        selected={formValues.initialDate}
         className="form-control"
-        onChange={(event)=>onDateChanged(event, 'start')}
+        onChange={(event)=>onDateChanged(event, 'initialDate')}
         dateFormat="Pp"
         showTimeSelect
         />
@@ -113,10 +113,10 @@ if (formValues.title.length<=0) {
     <div className="form-group mb-2">
         <label>Fecha y hora fin</label>
         <DatePicker
-        minDate={formValues.start}
-        selected={formValues.end}
+        minDate={formValues.initialDate}
+        selected={formValues.finalDate}
         className="form-control"
-        onChange={(event)=>onDateChanged(event, 'end')}
+        onChange={(event)=>onDateChanged(event, 'finalDate')}
         dateFormat="Pp"
         showTimeSelect
         />
@@ -145,8 +145,8 @@ if (formValues.title.length<=0) {
             className="form-control"
             placeholder="Notas"
             rows="5"
-            name="notes"
-            value={formValues.notes}
+            name="note"
+            value={formValues.note}
             onChange={onInputChange}
         ></textarea>
         <small id="emailHelp" className="form-text text-muted">Información adicional</small>

@@ -7,12 +7,13 @@ import parse from 'date-fns/parse'
 import startOfWeek from 'date-fns/startOfWeek'
 import getDay from 'date-fns/getDay'
 import enUS from 'date-fns/locale/en-US'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { CalendarModal } from '../component/CalendarModal'
 import { useUiStore } from '../../hooks/useUiStore'
 import { useCalendarStore } from '../../hooks/useCalendarStore'
 import { FabDelete } from '../component/FabDelete'
+import { useAuthStore } from '../../hooks/useAuthStore'
 
 
 const locales = {
@@ -30,13 +31,15 @@ export const localizer = dateFnsLocalizer({
 
 
 export const CalendarPage = () => {
-  const {events,setActiveEvent} = useCalendarStore();
+  const {user}=useAuthStore();
+  const {events,setActiveEvent, startLoadingEvents} = useCalendarStore();
   const { openDateModal } = useUiStore()
   const [lastView,setLastView]=useState(localStorage.getItem('lastView')||'week');
-  const eventStyleGetter=(event,start,end,isSelected)=>{
+  const eventStyleGetter=(event,initialDate,finalDate,isSelected)=>{
+const isMyEvent =(user.uid ===event.user._id) || (user.uid ===event.user.uid)
 
     const style={
-      backgroundColor:'#347CF7',
+      backgroundColor: isMyEvent?'#347CF7':"",
       borderRadius:'0px',
       opacity:0.8,
       color:'white'
@@ -58,6 +61,10 @@ openDateModal()
       localStorage.setItem('lastView',event)
       setLastView(event)
                 }
+
+    useEffect(() => {
+      startLoadingEvents();
+    }, [])
   return (
     <>
     <NavBar/>
@@ -65,9 +72,9 @@ openDateModal()
      localizer={localizer}
      events={events}
      defaultView={lastView}
-     startAccessor="start"
-     endAccessor="end"
-     style={{ height:'calc(100vh-80px)'}}
+     startAccessor="initialDate"
+     endAccessor="finalDate"
+     style={{ height:'calc(100vh - 80px)'}}
      eventPropGetter={eventStyleGetter}
      components={{event:CalendarBox}}
      onDoubleClickEvent={onDoubleClick}
